@@ -1,0 +1,49 @@
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    height: 120px;
+    background-color: rgba(4, 152, 250, 0.85);
+    border: none;
+    border-radius: 20px;
+    z-index: 1000;
+}
+
+.loading h1 {
+    font-size: 2rem;
+    color: white;
+    animation: moveHorizontally 3s infinite linear;
+    font-weight: 900;
+    margin-top: -10px;
+}
+
+.loading p {
+    background-color: white;
+    padding: 10px 15px 10px 15px;
+    font-size: 1.5rem;
+    border: none;
+    border-radius: 20px;
+    z-index: 1000;
+    font-weight: 700;
+    width: 420px;
+}
+
+/* Define the animation for horizontal movement */
+@keyframes moveHorizontally {
+    0% {
+        transform: translateX(-80px);
+    }
+
+    50% {
+        transform: translateX(100px);
+    }
+
+    100% {
+        transform: translateX(-80px);
+    }
+}
