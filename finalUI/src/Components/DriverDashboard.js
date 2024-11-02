@@ -436,6 +436,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '../CSS/DriverDashboard.css';
 import { useParams } from 'react-router-dom';
+import ConfirmationDialog from '../Components/DriverConfrom';
 
 // Fix default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
@@ -449,6 +450,8 @@ const DriverDashboard = () => {
   const [isAvailable, setIsAvailable] = useState(false);
   const [locationError, setLocationError] = useState('');
   const [rideRequests, setRideRequests] = useState([]);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const { token } = useParams();
 
   const toggleAvailability = () => {
@@ -465,33 +468,31 @@ const DriverDashboard = () => {
       const response = await fetch(`http://localhost:5000/api/driver/ride-requests/${token}`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", // Specify the content type
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`); // Throw an error if the response is not OK
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      const data = await response.json(); // Parse the JSON response
+      const data = await response.json();
       if (data.nearbyRequest) {
-        // Fetch user details for the nearby request
         const userResponse = await fetch(`http://localhost:5000/api/driver/user/${data.nearbyRequest.userId}`);
         if (!userResponse.ok) {
           throw new Error(`HTTP error! Status: ${userResponse.status}`);
         }
         const userDetails = await userResponse.json();
 
-        // Set the ride request along with user details
         const requestWithUserDetails = {
           ...data.nearbyRequest,
           userName: userDetails.username,
           userEmail: userDetails.email,
         };
 
-        setRideRequests([requestWithUserDetails]); // Set rideRequests to an array containing the single request
+        setRideRequests([requestWithUserDetails]);
       } else {
-        setRideRequests([]); // No nearby requests found
+        setRideRequests([]);
         setLocationError('No nearby ride requests available.');
       }
     } catch (error) {
@@ -500,25 +501,33 @@ const DriverDashboard = () => {
     }
   };
 
-  const acceptRideRequest = async (rideRequestId) => {
-    try {
-      const response = await axios.put(`http://localhost:5000/api/driver/accept/${rideRequestId}`);
-      if (response.status === 200) {
-        // Update the local state with the new status
-        setRideRequests((prevRequests) =>
-          prevRequests.map((request) =>
-            request._id === rideRequestId ? { ...request, status: 'accepted' } : request
-          )
-        );
+  const handleAcceptClick = (request) => {
+    setSelectedRequest(request);
+    setShowConfirmDialog(true);
+  };
+
+  const confirmRideRequest = async () => {
+    if (selectedRequest) {
+      try {
+        const response = await axios.put(`http://localhost:5000/api/driver/accept/${selectedRequest._id}`);
+        if (response.status === 200) {
+          setRideRequests((prevRequests) =>
+            prevRequests.map((request) =>
+              request._id === selectedRequest._id ? { ...request, status: 'accepted' } : request
+            )
+          );
+        }
+      } catch (error) {
+        console.error('Error accepting ride request:', error);
+        setLocationError('Failed to accept the ride request. Please try again.');
       }
-    } catch (error) {
-      console.error('Error accepting ride request:', error);
-      setLocationError('Failed to accept the ride request. Please try again.');
+      setShowConfirmDialog(false);
+      setSelectedRequest(null);
     }
   };
 
   return (
-    <div className="dashboard-container p-4">
+    <div className="dashboard-container p-4"  style={{ zIndex:0}}>
       <h1 className="text-2xl font-bold">Driver Dashboard</h1>
 
       <div className="availability-section my-4">
@@ -538,7 +547,7 @@ const DriverDashboard = () => {
             <div key={request._id} className="request-card border rounded shadow-lg mb-4">
               <div className="map-container">
                 <MapContainer
-                  center={request.pickup.coordinates.coordinates.reverse()} // Adjusted to ensure proper coordinates
+                  center={request.pickup.coordinates.coordinates.reverse()}
                   zoom={13}
                   style={{ height: '250px', width: '100%' }}
                   className="rounded-t"
@@ -568,18 +577,25 @@ const DriverDashboard = () => {
                 <p><strong>No of Passengers:</strong> {request.numPassengers}</p>
                 <p><strong>User Name:</strong> {request.userName || 'Not available'}</p>
                 <p><strong>User Email:</strong> {request.userEmail || 'Not available'}</p>
-            
-                  <button 
-                    className="accept-button bg-blue-500 text-white py-1 px-3 rounded" 
-                    onClick={() => acceptRideRequest(request._id)} // Call the accept function
-                  >
-                    Accept Ride
-                  </button>
-             
+                
+                <button 
+                  className="accept-button bg-blue-500 text-white py-1 px-3 rounded" 
+                  onClick={() => handleAcceptClick(request)}
+                >
+                  Accept Ride
+                </button>
               </div>
             </div>
           ))}
         </div>
+      )}
+
+      {showConfirmDialog && selectedRequest && (
+        <ConfirmationDialog
+          onConfirm={confirmRideRequest}
+          onCancel={() => setShowConfirmDialog(false)}
+          request={selectedRequest}
+        />
       )}
     </div>
   );

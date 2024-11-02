@@ -3,6 +3,7 @@ import Loader from "../Components/Loader/Loader";
 import React from 'react';
 
 const RideConfirmationDialog = ({ pickup, dropoff, vehicleType, numPassengers, onConfirm, onCancel, loading }) => {
+  console.log(vehicleType)
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[1050]">
       <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md mx-4 md:mx-0 z-[1051]">

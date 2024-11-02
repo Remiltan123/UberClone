@@ -35,18 +35,18 @@
 //     }),
 //     redirect: "follow"
 //   }), []);
-  
+
 //   const geocode = useCallback(async (latlng) => {
 //     try {
 //       const response = await fetch(
 //         `https://google-map-places.p.rapidapi.com/maps/api/geocode/json?latlng=${latlng[0]},${latlng[1]}&language=en&region=en&location_type=APPROXIMATE`,
 //         requestOptions
 //       );
-  
+
 //       if (!response.ok) {
 //         throw new Error(`HTTP error! status: ${response.status}`);
 //       }
-  
+
 //       const data = await response.json();
 //       return data.results || [];
 //     } catch (error) {
@@ -137,17 +137,17 @@
 //       alert('Please select valid pickup and dropoff locations.');
 //       return; 
 //     }
-  
+
 //     console.log('Searching for a ride from', pickup, 'to', dropoff, 'with vehicle type', vehicleType, 'for', numPassengers, 'passengers.');
 //     console.log('Pickup coordinates:', pickupCoords);
 //     console.log('Dropoff coordinates:', dropoffCoords);
-  
+
 //     if (!token) {
 //       console.error('No token found, user might not be logged in.');
 //       alert('You must be logged in to request a ride.');
 //       return; 
 //     }
-  
+
 //     try {
 //       const decodedToken = jwtDecode(token);
 //       const role = decodedToken.user?.role; 
@@ -176,12 +176,12 @@
 //         },
 //         body: JSON.stringify(requestBody),
 //       });
-  
+
 //       if (!response.ok) {
 //         const errorResponse = await response.json();
 //         throw new Error(errorResponse.message || 'Failed to create ride request');
 //       }
-  
+
 //       const data = await response.json();
 //       alert('Ride request created successfully! Looking for nearby drivers...');
 //     } catch (error) {
@@ -193,7 +193,7 @@
 //       <div>
 //         {/* Navbar */}
 //         <Navbar />
-  
+
 //         {/* Main Content */}
 //         <div className="container mx-auto p-4">
 //           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -221,10 +221,10 @@
 //                 )}
 //               </MapContainer>
 //             </div>
-  
+
 //             <div className="space-y-4">
 //               <h2 className="text-2xl font-semibold">Search for Your Ride</h2>
-  
+
 //               {/* Pickup Input */}
 //               <div className="space-y-2">
 //                 <label htmlFor="pickup" className="block text-sm font-medium">
@@ -252,7 +252,7 @@
 //                   </div>
 //                 )}
 //               </div>
-  
+
 //               {/* Drop-off Input */}
 //               <div className="space-y-2">
 //                 <label htmlFor="dropoff" className="block text-sm font-medium">
@@ -280,7 +280,7 @@
 //                   </div>
 //                 )}
 //               </div>
-  
+
 //               {/* Vehicle Type */}
 //               <div className="space-y-2">
 //                 <label htmlFor="vehicleType" className="block text-sm font-medium">
@@ -297,7 +297,7 @@
 //                   <option value="Van">Van</option>
 //                 </select>
 //               </div>
-  
+
 //               {/* Number of Passengers */}
 //               <div className="space-y-2">
 //                 <label htmlFor="numPassengers" className="block text-sm font-medium">
@@ -312,7 +312,7 @@
 //                   min={1}
 //                 />
 //               </div>
-  
+
 //               {/* Search Ride Button */}
 //               <button
 //                 onClick={handleSearchRide}
@@ -323,7 +323,7 @@
 //             </div>
 //           </div>
 //         </div>
-  
+
 //         {/* Footer */}
 //         <Footer />
 //       </div>
@@ -366,16 +366,16 @@ const UserDashboard = () => {
 
   const fetchRideRequests = async () => {
     try {
-        const response = await fetch('http://localhost:5000/api/driver/ride-requests');
-        const data = await response.json();
+      const response = await fetch('http://localhost:5000/api/driver/ride-requests');
+      const data = await response.json();
 
-        if (response.ok) {
-            setAccepted(data.accepted);
-        } else {
-            alert("Error fetching ride requests, try later");
-        }
+      if (response.ok) {
+        setAccepted(data.accepted);
+      } else {
+        alert("Error fetching ride requests, try later");
+      }
     } catch (err) {
-        console.error('Error fetching ride requests:', err.message);
+      console.error('Error fetching ride requests:', err.message);
     }
   };
 
@@ -388,7 +388,7 @@ const UserDashboard = () => {
   const requestOptions = useMemo(() => ({
     method: 'GET',
     headers: new Headers({
-     "x-rapidapi-key": "962111a97cmshe5fa71b93e2a226p128708jsn2f0b2b4e19e8",
+      "x-rapidapi-key": "962111a97cmshe5fa71b93e2a226p128708jsn2f0b2b4e19e8",
       'x-rapidapi-host': 'google-map-places.p.rapidapi.com',
       Accept: 'application/json',
     }),
@@ -543,7 +543,7 @@ const UserDashboard = () => {
     } catch (error) {
       console.error('Error confirming ride:', error);
       alert('An error occurred while confirming the ride. Please try again.');
-    } 
+    }
   };
 
   const handleCancelRide = () => {
@@ -613,6 +613,10 @@ const UserDashboard = () => {
         <RideConfirmationDialog
           onConfirm={handleConfirmRide}
           onCancel={handleCancelRide}
+          pickup={pickup}
+          dropoff={dropoff}
+          vehicleType={vehicleType}
+          numPassengers={numPassengers}
         />
       )}
       {loading && !accepted && <Loader />}
